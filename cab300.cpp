@@ -82,7 +82,7 @@ void CAB300::calcAmperes()
     timestamp = millis();                       // reset timestamp to current time
     ampseconds=((elapsedtime * Amperes)/3600000); //Number of amphours since last message
     AH+=ampseconds;
-    if(stepcount++ >20)     // This bit uses a step counter to write to EEPROM every 20th read.  In this way, we don't wear out our EEPROM.
+    if(stepcount++ >100000)     // This bit uses a step counter to write to EEPROM every 20th read.  In this way, we don't wear out our EEPROM.
     						//But our retrieved AH later will be a little short.
     	{					
     	 EEPROM_write(AHaddress,AH);

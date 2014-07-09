@@ -12,6 +12,7 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 CAB300 Sensor;//Instantiate CAB300 object as "Sensor" and set EEPROM storage address for AH to 100
 char buffer[90];
 double Amps;
+int stepcount=0;
 
 void setup() 
 {
@@ -22,15 +23,19 @@ void setup()
 
 void loop()
 {
-  	Amps=Sensor.getamps();  //Checks for CAN messages.  You must call this periodically to receive CAN messages
-		
-	printimestamp();  //Prints values in milliamperes, Amperes, and accummulated ampere hours derived from CAB300 CAN messages
-        Serial<<"Milliamps: "<<Sensor.milliamps<<" ";
-          sprintf(buffer,"%4.2f",Sensor.Amperes); 
-        Serial<<"Amps: "<<buffer<<" ";
-          sprintf(buffer,"%4.3f",Sensor.AH); 
-        Serial<<"Total AmpHours: "<<buffer<<" \n";  
-       
+  	if(Sensor.getamps())  //Checks for CAN messages.  You must call this periodically to receive CAN messages
+	{
+        if(stepcount++>70)
+          {	
+	    printimestamp();  //Prints values in milliamperes, Amperes, and accummulated ampere hours derived from CAB300 CAN messages
+            Serial<<"Milliamps: "<<Sensor.milliamps<<" ";
+            sprintf(buffer,"%4.2f",Sensor.Amperes); 
+            Serial<<"Amps: "<<buffer<<" ";
+            sprintf(buffer,"%4.3f",Sensor.AH); 
+            Serial<<"Total AmpHours: "<<buffer<<" \n";  
+            stepcount=0;
+          }
+         }
         checkforinput(); //Check keyboard    
 }
    
@@ -46,8 +51,8 @@ void checkforinput()
       int inByte = Serial.read();
       switch (inByte)
        {
-       	case 'z':    //Zeroes ampere-hours
-      		Sensor.AH=0;
+       	   case 'z':    //Zeroes ampere-hours
+      		Sensor.resetAH();
       		break;
            case 'd':     //Causes CAB300 object to print incoming CAN messages for debugging
       		if(Sensor.debug==1){Sensor.debug--;}
@@ -70,5 +75,4 @@ void printimestamp()
     sprintf(buffer,"%02d:%02d:%02d.%03d", hours, minutes, seconds, milliseconds);
     Serial<<buffer<<" ";
 }
-
 
