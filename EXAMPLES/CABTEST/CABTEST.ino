@@ -1,6 +1,5 @@
 
 #include <Arduino.h>
-#include <due_can.h>
 #include <due_wire.h>
 #include <eeprom.h>
 #include <eepromAny.h>
@@ -16,18 +15,18 @@ int stepcount=0;
 
 void setup() 
 {
-    Sensor.begin(100);//Initialize CAB300 to store AH at EEPROM address provided
+    Sensor.begin(100,0);//Initialize CAB300 to store AH at EEPROM address provided and CAN0
      Serial.begin(115200);
      Serial.println(" LEM CAB 300=C Startup successful.   Version 1.00");  
 }
 
 void loop()
 {
-  	if(Sensor.getamps())  //Checks for CAN messages.  You must call this periodically to receive CAN messages
-	{
+  
+	
         if(stepcount++>70)
           {	
-	    printimestamp();  //Prints values in milliamperes, Amperes, and accummulated ampere hours derived from CAB300 CAN messages
+		  	printimestamp();  //Prints values in milliamperes, Amperes, and accummulated ampere hours derived from CAB300 CAN messages
             Serial<<"Milliamps: "<<Sensor.milliamps<<" ";
             sprintf(buffer,"%4.2f",Sensor.Amperes); 
             Serial<<"Amps: "<<buffer<<" ";
@@ -35,7 +34,7 @@ void loop()
             Serial<<"Total AmpHours: "<<buffer<<" \n";  
             stepcount=0;
           }
-         }
+         
         checkforinput(); //Check keyboard    
 }
    
