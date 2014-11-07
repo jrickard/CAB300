@@ -20,9 +20,9 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 
 
 // Define the constructor.
-CAB300::CAB300 (int ahadd)
+CAB300::CAB300()
 {
-	AHaddress=ahadd;
+	
 	 timestamp = millis(); 
 	 stepcount=0;
 	 debug=0;

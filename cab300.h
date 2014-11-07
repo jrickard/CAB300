@@ -20,14 +20,14 @@
 #include "Arduino.h"
 #include <due_can.h>
 #include <due_wire.h>
+
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
 
 class CAB300
 {
 	public:
-		int ahadd;
-		CAB300(int);
+		CAB300();
        ~CAB300();
 				
 		void resetAH();
