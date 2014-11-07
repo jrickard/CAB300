@@ -18,7 +18,7 @@ class EEPROMvariables {
 };
 EEPROMvariables myVars;
 uint16_t page=875;
-float Version=1.00;
+float Version=1.05;
 char buffer[30];
 int stepcount=0;
 int startime;
@@ -52,8 +52,7 @@ void setup()
   initEEPROM(); //Load our persistant variables from EEPROM.
   Sensor.AH=myVars.AH;  //Set the sensor AH variable to our saved amp hours
   initCAN(myVars.port,myVars.dashnumber,myVars.enablepin);  //Can port, CAB300 dash number (0 to 10), enable pin (255 if none used)
-  Serial<<"CAN bus initialized \n";
-  Serial<<"LEM CAB300-C Startup Successful \n";
+  Serial<<"\nLEM CAB300-C Startup Successful \n";
   printMenu();
 }
 
@@ -61,21 +60,27 @@ void loop()
 {
         if(stepcount++>200000)  //We're only going to print and save our values every 200,000 cycles.
           {	
-	    printimestamp();  
-            Serial<<"ma: "<<Sensor.milliamps<<" ";
-            sprintf(buffer,"%4.2f",Sensor.Amperes); 
-            Serial<<"  Amps: "<<buffer<<" ";
-            sprintf(buffer,"%4.4f",Sensor.AH); 
-            Serial<<" Total AmpHours: "<<buffer; 
-            Serial<<"  Frame Count: "<<Sensor.framecount<<" \n";
-            myVars.AH=Sensor.AH;  //Copy sensor AH into our EEPROM page
-            stepcount=0; 
+	    stepcount=0;
+            printStatus(); 
             EEPROM.write(page, myVars);  //Save persistent variables to EEPROM
           }
          
         checkforinput(); //Check keyboard for user input 
 }
-   
+ 
+ 
+void printStatus()
+{
+   printimestamp();  
+  // Serial<<"ma: "<<Sensor.milliamps<<" ";
+   sprintf(buffer,"%4.3f",Sensor.Amperes); 
+   Serial<<"  Amperes: "<<buffer<<" ";
+   sprintf(buffer,"%4.4f",Sensor.AH); 
+   Serial<<" AmpHours: "<<buffer; 
+   Serial<<"  Frame Count: "<<Sensor.framecount<<" \n";
+   myVars.AH=Sensor.AH;  //Copy sensor AH into our EEPROM page
+}
+
  
 
 void checkforinput()
@@ -173,6 +178,9 @@ void initCAN(int port, int dashnumber, int enablepin)
 			else {Can1.setRXFilter(6, 0x3C2, 0x7FF, false);}	
 				
 			Can1.setCallback(6, gotCABFrame);
+                Serial<<"\nCAN bus initialized on port "<<port<<"  using enable pin "
+                  <<enablepin<<" for CAB300 dash "<<dashnumber<<" \n";
+ 
 		}
 		
 	 	else
@@ -183,6 +191,8 @@ void initCAN(int port, int dashnumber, int enablepin)
 				else {Can0.setRXFilter(6, 0x3C2, 0x7FF, false);}	
 				
 			Can0.setCallback(6, gotCABFrame);
+                        Serial<<"\nCAN bus initialized on port "<<port<<"  using enable pin "
+                          <<enablepin<<" for CAB300 dash "<<dashnumber<<" \n";
                         }
 }
 
@@ -210,7 +220,8 @@ void printMenu()
 {
    Serial<<"\f\n=========== LEM CAB300-C/SP3-xxx Sample Program Version "<<Version<<" ==============\n************ List of Available Commands ************\n\n";
    Serial<<"  ?  - Print this menu\n ";
-   Serial<<"  Z  - zero ampere-hours\n ";
+   Serial<<"  z  - zero ampere-hours\n ";
+   Serial<<"  Z  - zero timeclock\n ";
    Serial<<"  F  - zero frame count\n ";
    Serial<<"  C  - CAN bus selector\n         C0=CAN0\n         C1=CAN1\n ";
    Serial<<"  D - toggles Debug off and on to print recieved CAN data traffic\n";
