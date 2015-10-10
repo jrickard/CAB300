@@ -12,7 +12,7 @@
     
 */
 
-#include "Arduino.h"
+#include "variant.h"
 #include "cab300.h"
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
@@ -35,6 +35,12 @@ CAB300::~CAB300() //Define destructor
 {
 	}
 
+void CAB300::gotFrame(CAN_FRAME* frame, int mailbox)
+ 
+//This is our CAN listener to catch inbound frames
+{
+    this->calcAmperes(frame);
+}
 
 void CAB300::calcAmperes(CAN_FRAME *frame)
 

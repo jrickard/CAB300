@@ -17,14 +17,13 @@
     
     
 
-#include "Arduino.h"
+#include "variant.h"
 #include <due_can.h>
-#include <due_wire.h>
 
 #define SWAP_UINT32(x) (((x) >> 24) | (((x) & 0x00FF0000) >> 8) | (((x) & 0x0000FF00) << 8) | ((x) << 24))
 
 
-class CAB300
+class CAB300 : public CANListener
 {
 	public:
 		CAB300();
@@ -39,6 +38,7 @@ class CAB300
 		double milliamps;
 		void calcAmperes(CAN_FRAME *frame);
 		void printCAN(CAN_FRAME *frame);
+		void gotFrame(CAN_FRAME *frame, int mailbox); //overrides the parent version so we can actually do something
 		
 
 	private:
